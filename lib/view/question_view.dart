@@ -2,25 +2,29 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:quizbox/model/question.dart';
+import 'package:quizbox/model/question_provider.dart';
+import 'package:quizbox/model/score_provider.dart';
+import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:quizbox/view/wrong_screen.dart';
-
-//TODO: Close ikonunu daha kalın bir ikon ile değiştir.
+import 'package:quizbox/widget/timer.dart';
+import 'package:provider/provider.dart';
 
 class QuestionView extends StatefulWidget {
   static String routeName = '/question';
-  final List<Question> question;
-
-  const QuestionView({Key key, this.question}) : super(key: key);
   @override
   _QuestionViewState createState() => _QuestionViewState();
 }
 
 class _QuestionViewState extends State<QuestionView> {
-  int questionNumber = 0;
+  int score;
+  int questionNumber;
+  int remainQuestion;
+  String difficulty;
   String trueAnswer;
   String questionText;
+  List<dynamic> deneme;
 
   List shuffle(List items) {
     var random = new Random();
@@ -38,17 +42,63 @@ class _QuestionViewState extends State<QuestionView> {
     return items;
   }
 
+  List<dynamic> demo() {
+    return shuffle([
+      context.read<QuestionProvider>().questionBank[questionNumber].trueAnswer,
+      context
+          .read<QuestionProvider>()
+          .questionBank[questionNumber]
+          .wrongAnswer_1,
+      context
+          .read<QuestionProvider>()
+          .questionBank[questionNumber]
+          .wrongAnswer_2,
+      context
+          .read<QuestionProvider>()
+          .questionBank[questionNumber]
+          .wrongAnswer_3,
+    ]);
+  }
+
+  int diffucltyPoint() {
+    difficulty = context
+        .read<QuestionProvider>()
+        .questionBank[questionNumber]
+        .difficulty;
+    switch (difficulty) {
+      case 'Easy':
+        return 3;
+        break;
+      case 'Medium':
+        return 5;
+        break;
+      case 'Hard':
+        return 7;
+        break;
+      default:
+        return 0;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    questionNumber = context.read<QuestionProvider>().questionNumber;
+    trueAnswer = context
+        .read<QuestionProvider>()
+        .questionBank[questionNumber]
+        .trueAnswer;
+    score = context.read<ScoreProvider>().score;
+    deneme = demo();
+/*     print(context.read<QuestionProvider>().questionBank.length);
+    if (context.read<QuestionProvider>().questionBank.length == 15) {
+      context.read<ScoreProvider>().setRemainQuestion(
+          context.read<QuestionProvider>().questionBank.length);
+    } */
+  }
+
   @override
   Widget build(BuildContext context) {
-    questionText = widget.question[questionNumber].questionText;
-    trueAnswer = widget.question[questionNumber].trueAnswer;
-    List<String> questionAnswers = [
-      widget.question[questionNumber].trueAnswer,
-      widget.question[questionNumber].wrongAnswer_1,
-      widget.question[questionNumber].wrongAnswer_2,
-      widget.question[questionNumber].wrongAnswer_3,
-    ];
-    List<String> shuffledQuestionsA = shuffle(questionAnswers);
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -98,8 +148,10 @@ class _QuestionViewState extends State<QuestionView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("Kalan Soru:15", style: kQuestionInfoText),
-                      Text("Puan: 150", style: kQuestionInfoText),
+                      Text(
+                          "Kalan Soru: ${context.watch<ScoreProvider>().remainQuestion}",
+                          style: kQuestionInfoText),
+                      Text("Puan: $score", style: kQuestionInfoText),
                     ],
                   ),
                 ),
@@ -112,7 +164,7 @@ class _QuestionViewState extends State<QuestionView> {
                       padding: EdgeInsets.symmetric(
                           horizontal: getProportionateScreenHeight(28.0)),
                       child: Text(
-                        '$questionText',
+                        '${context.watch<QuestionProvider>().questionBank[questionNumber].questionText}',
                         style: kQuestionTextStyle,
                       ),
                     ),
@@ -127,124 +179,73 @@ class _QuestionViewState extends State<QuestionView> {
                       width: 15,
                     ),
                     SizedBox(width: 4),
-                    Text("15", style: kQuestionTimeText),
+                    Countdown(),
                   ],
                 ),
                 SizedBox(height: 28),
-                InkWell(
-                  onTap: () {
-                    if (trueAnswer == shuffledQuestionsA[0]) {
-                      setState(() {
-                        questionNumber++;
-                        questionText =
-                            widget.question[questionNumber].questionText;
-                      });
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => WrongScreen(),
-                        ),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: deneme.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 36),
+                    itemBuilder: (context, index) {
+                      return ChoiceButton(
+                        text: deneme[index],
+                        onPressed: () {
+                          if (trueAnswer == deneme[index]) {
+                            setState(
+                              () {
+                                context.read<ScoreProvider>().newScore(
+                                    diffucltyPoint() *
+                                        context.read<TimeModel>().countDown);
+                                context.read<ScoreProvider>().decrease();
+                                Navigator.of(context)
+                                    .popAndPushNamed('/true_screen');
+                              },
+                            );
+                            context.read<TimeModel>().resetCountDown(15);
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    WrongScreen(),
+                              ),
+                            );
+                          }
+                        },
                       );
-                    }
-                  },
-                  child: Container(
-                    width: getProportionateScreenWidth(360),
-                    height: getProportionateScreenHeight(48),
-                    decoration: kAnswerBoxStyle,
-                    child: Center(
-                      child: Text('${shuffledQuestionsA[0]}',
-                          style: kQuestionTextStyle),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 36),
-                InkWell(
-                  onTap: () {
-                    if (trueAnswer == shuffledQuestionsA[1]) {
-                      setState(() {
-                        questionNumber++;
-                        questionText =
-                            widget.question[questionNumber].questionText;
-                      });
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => WrongScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    width: getProportionateScreenWidth(360),
-                    height: getProportionateScreenHeight(48),
-                    decoration: kAnswerBoxStyle,
-                    child: Center(
-                      child: Text('${shuffledQuestionsA[1]}',
-                          style: kQuestionTextStyle),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 36),
-                InkWell(
-                  onTap: () {
-                    if (trueAnswer == shuffledQuestionsA[2]) {
-                      setState(() {
-                        questionNumber++;
-                        questionText =
-                            widget.question[questionNumber].questionText;
-                      });
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => WrongScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    width: getProportionateScreenWidth(360),
-                    height: getProportionateScreenHeight(48),
-                    decoration: kAnswerBoxStyle,
-                    child: Center(
-                      child: Text('${shuffledQuestionsA[2]}',
-                          style: kQuestionTextStyle),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 36),
-                InkWell(
-                  onTap: () {
-                    if (trueAnswer == shuffledQuestionsA[3]) {
-                      setState(() {
-                        questionNumber++;
-                        questionText =
-                            widget.question[questionNumber].questionText;
-                      });
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => WrongScreen(),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    width: getProportionateScreenWidth(360),
-                    height: getProportionateScreenHeight(48),
-                    decoration: kAnswerBoxStyle,
-                    child: Center(
-                      child: Text('${shuffledQuestionsA[3]}',
-                          style: kQuestionTextStyle),
-                    ),
+                    },
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChoiceButton extends StatelessWidget {
+  final String text;
+  final Function onPressed;
+
+  const ChoiceButton({Key key, this.text, this.onPressed}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: getProportionateScreenWidth(360),
+      height: getProportionateScreenHeight(48),
+      decoration: kButtonBoxDeco,
+      child: FlatButton(
+        onPressed: () {
+          onPressed();
+        },
+        child: Text(text, style: kQuestionTextStyle),
+        color: kSecondaryColor,
+        splashColor: kThirdColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50.0),
         ),
       ),
     );

@@ -1,12 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quizbox/model/question.dart';
+import 'package:quizbox/model/question_provider.dart';
+import 'package:quizbox/model/score_provider.dart';
+import 'package:quizbox/model/time_model.dart';
+import 'package:quizbox/services/database_helper.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:quizbox/view/cong_screen.dart';
 import 'package:quizbox/view/home.dart';
+import 'package:quizbox/widget/custom_button.dart';
+import 'package:provider/provider.dart';
 
-class WrongScreen extends StatelessWidget {
+class WrongScreen extends StatefulWidget {
   static String routeName = '/wrong_screen';
+
+  @override
+  _WrongScreenState createState() => _WrongScreenState();
+}
+
+class _WrongScreenState extends State<WrongScreen> {
+  DatabaseHelper dbHelper = DatabaseHelper.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTimer();
+    clearList();
+    dbHelper.getRandom().then((value) {
+      setState(() {
+        value.forEach((element) {
+          context.read<QuestionProvider>().addItem(Question.map(element));
+        });
+      });
+    });
+  }
+
+  void updateTimer() {
+    context.read<TimeModel>().resetCountDown(15);
+  }
+
+  void clearList() {
+    if (context.read<QuestionProvider>().questionBank.length > 0) {
+      context.read<QuestionProvider>().deleteAllItem();
+    }
+  }
+
+  void resetScore() {
+    if (context.read<ScoreProvider>().score > 0) {
+      context.read<ScoreProvider>().resetScore();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,8 +78,9 @@ class WrongScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Lottie.network(
-                "https://assets1.lottiefiles.com/packages/lf20_kyqRXF.json",
+              Lottie.asset(
+                "assets/animation/wrong.json",
+                repeat: false,
                 width: getProportionateScreenWidth(256),
                 height: getProportionateScreenHeight(256),
               ),
@@ -42,8 +88,9 @@ class WrongScreen extends StatelessWidget {
               SizedBox(height: getProportionateScreenHeight(22)),
               Text('8 soruyu doğru cevapladınız', style: kResultInfoText),
               SizedBox(height: getProportionateScreenHeight(28)),
-              Text('Yeni Yüksek Skor', style: kScoreInfoTextStyle),
-              Text('860', style: kScoreTextStyle),
+              Text('Skor', style: kScoreInfoTextStyle),
+              Text('${context.watch<ScoreProvider>().score}',
+                  style: kScoreTextStyle),
               SizedBox(height: getProportionateScreenHeight(48)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -52,12 +99,8 @@ class WrongScreen extends StatelessWidget {
                     text: 'Yeniden Oyna',
                     color: kSecondaryColor,
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => CongScreen(),
-                        ),
-                      );
+                      resetScore();
+                      Navigator.of(context).popAndPushNamed('/question');
                     },
                   ),
                   SizedBox(width: getProportionateScreenWidth(20.0)),
@@ -78,34 +121,6 @@ class WrongScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CustomButton extends StatelessWidget {
-  final Color color;
-  final String text;
-  final Function onPressed;
-
-  CustomButton({this.color, this.text, this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: kButtonBoxDeco,
-      child: FlatButton(
-        onPressed: () {
-          onPressed();
-        },
-        child: Text(text, style: kButtonTextStyle),
-        color: color,
-        splashColor: kThirdColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50.0),
-        ),
-        height: getProportionateScreenHeight(48.0),
-        minWidth: getProportionateScreenWidth(160.0),
       ),
     );
   }

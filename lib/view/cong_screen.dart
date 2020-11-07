@@ -3,7 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:quizbox/view/home.dart';
-import 'package:quizbox/view/wrong_screen.dart';
+import 'package:quizbox/widget/custom_button.dart';
 
 class CongScreen extends StatelessWidget {
   static String routeName = '/cong_screen';

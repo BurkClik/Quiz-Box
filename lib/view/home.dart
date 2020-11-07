@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:quizbox/model/question.dart';
+import 'package:quizbox/model/question_provider.dart';
+import 'package:quizbox/model/score_provider.dart';
+import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/services/database_helper.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:quizbox/view/question_view.dart';
+import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   static String routeName = '/home';
@@ -14,19 +18,37 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Question> question = new List();
   DatabaseHelper dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
+    updateTimer();
+    clearList();
+    resetScore();
     dbHelper.getRandom().then((value) {
       setState(() {
         value.forEach((element) {
-          question.add(Question.map(element));
+          context.read<QuestionProvider>().addItem(Question.map(element));
         });
       });
     });
+  }
+
+  void updateTimer() {
+    context.read<TimeModel>().resetCountDown(15);
+  }
+
+  void clearList() {
+    if (context.read<QuestionProvider>().questionBank.length > 0) {
+      context.read<QuestionProvider>().deleteAllItem();
+    }
+  }
+
+  void resetScore() {
+    if (context.read<ScoreProvider>().score > 0) {
+      context.read<ScoreProvider>().resetScore();
+    }
   }
 
   @override
@@ -58,10 +80,7 @@ class _HomeState extends State<Home> {
                 leftAssetName: 'assets/icons/culture.svg',
                 rightCategoryName: 'Bilim',
                 rightAssetName: 'assets/icons/science.svg',
-                getData: () {
-                  print('${question[0].questionText}');
-                },
-                question: question,
+                getData: () {},
               ),
               SizedBox(height: 10),
               CategoryRow(
@@ -110,7 +129,6 @@ class CategoryRow extends StatelessWidget {
   final double rightWidth;
   final double rightHeight;
   final Function getData;
-  final List<Question> question;
 
   CategoryRow({
     @required this.leftCategoryName,
@@ -118,7 +136,6 @@ class CategoryRow extends StatelessWidget {
     @required this.rightCategoryName,
     @required this.rightAssetName,
     this.getData,
-    this.question,
     double leftWidth,
     double leftHeight,
     double rightWidth,
@@ -139,7 +156,6 @@ class CategoryRow extends StatelessWidget {
           width: leftWidth,
           height: leftHeight,
           getData: getData,
-          question: question,
         ),
         SizedBox(width: getProportionateScreenHeight(48.0)),
         CategoryBox(
@@ -148,7 +164,6 @@ class CategoryRow extends StatelessWidget {
           width: rightWidth,
           height: rightHeight,
           getData: getData,
-          question: question,
         ),
       ],
     );
@@ -161,13 +176,11 @@ class CategoryBox extends StatelessWidget {
   final double width;
   final double height;
   final Function getData;
-  final List<Question> question;
 
   CategoryBox(
       {@required this.categoryName,
       @required this.assetName,
       this.getData,
-      this.question,
       this.width,
       this.height});
 
@@ -179,7 +192,7 @@ class CategoryBox extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => QuestionView(question: question),
+            builder: (BuildContext context) => QuestionView(),
           ),
         );
       },
