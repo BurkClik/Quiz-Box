@@ -26,11 +26,15 @@ class _HomeState extends State<Home> {
     updateTimer();
     clearList();
     resetScore();
+    resetTrueNumber();
+    context.read<QuestionProvider>().resetQuestionNumber();
     dbHelper.getRandom().then((value) {
       setState(() {
         value.forEach((element) {
           context.read<QuestionProvider>().addItem(Question.map(element));
         });
+        context.read<ScoreProvider>().setRemainQuestion(
+            context.read<QuestionProvider>().questionBank.length - 1);
       });
     });
   }
@@ -48,6 +52,12 @@ class _HomeState extends State<Home> {
   void resetScore() {
     if (context.read<ScoreProvider>().score > 0) {
       context.read<ScoreProvider>().resetScore();
+    }
+  }
+
+  void resetTrueNumber() {
+    if (context.read<ScoreProvider>().trueQuestion > 0) {
+      context.read<ScoreProvider>().resetTrueCount();
     }
   }
 
@@ -187,6 +197,8 @@ class CategoryBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      splashColor: Colors.orange,
+      highlightColor: Colors.transparent,
       onTap: () {
         getData();
         Navigator.pushReplacement(

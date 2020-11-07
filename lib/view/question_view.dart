@@ -24,7 +24,7 @@ class _QuestionViewState extends State<QuestionView> {
   String difficulty;
   String trueAnswer;
   String questionText;
-  List<dynamic> deneme;
+  List<dynamic> shuffledList;
 
   List shuffle(List items) {
     var random = new Random();
@@ -89,12 +89,7 @@ class _QuestionViewState extends State<QuestionView> {
         .questionBank[questionNumber]
         .trueAnswer;
     score = context.read<ScoreProvider>().score;
-    deneme = demo();
-/*     print(context.read<QuestionProvider>().questionBank.length);
-    if (context.read<QuestionProvider>().questionBank.length == 15) {
-      context.read<ScoreProvider>().setRemainQuestion(
-          context.read<QuestionProvider>().questionBank.length);
-    } */
+    shuffledList = demo();
   }
 
   @override
@@ -185,24 +180,39 @@ class _QuestionViewState extends State<QuestionView> {
                 SizedBox(height: 28),
                 Expanded(
                   child: ListView.separated(
-                    itemCount: deneme.length,
+                    itemCount: shuffledList.length,
                     separatorBuilder: (context, index) => SizedBox(height: 36),
                     itemBuilder: (context, index) {
                       return ChoiceButton(
-                        text: deneme[index],
+                        text: shuffledList[index],
                         onPressed: () {
-                          if (trueAnswer == deneme[index]) {
-                            setState(
-                              () {
+                          if (trueAnswer == shuffledList[index]) {
+                            // if'i == 0 yap!
+                            if (context.read<ScoreProvider>().remainQuestion !=
+                                0) {
+                              setState(() {
                                 context.read<ScoreProvider>().newScore(
                                     diffucltyPoint() *
                                         context.read<TimeModel>().countDown);
-                                context.read<ScoreProvider>().decrease();
+                                context.read<ScoreProvider>().increaseTrue();
+                                context
+                                    .read<QuestionProvider>()
+                                    .resetQuestionNumber();
                                 Navigator.of(context)
-                                    .popAndPushNamed('/true_screen');
-                              },
-                            );
-                            context.read<TimeModel>().resetCountDown(15);
+                                    .popAndPushNamed('/cong_screen');
+                              });
+                            } else {
+                              setState(
+                                () {
+                                  context.read<ScoreProvider>().newScore(
+                                      diffucltyPoint() *
+                                          context.read<TimeModel>().countDown);
+                                  context.read<ScoreProvider>().increaseTrue();
+                                  Navigator.of(context)
+                                      .popAndPushNamed('/true_screen');
+                                },
+                              );
+                            }
                           } else {
                             Navigator.pushReplacement(
                               context,

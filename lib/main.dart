@@ -10,17 +10,19 @@ import 'package:quizbox/view/splash.dart';
 /// TODO:
 /// [X] Seçenekleri InkWell'den Button'a döndür
 /// [X] List separated ile ekrana Buttonları bastır.
-/// [] Puan sistemini düzenle.
+/// [X] Puan sistemini düzenle.
 /// [] Süreyi düzenle
 ///   [X] Yeni soruya geçildiği zaman süre resetle.
 ///   [] Süre dolduğu zaman hata ekranına git.
 /// [X] Yeniden başlat butonuna tıklandığında dbden yeni soruları çeksin
-/// [] Kalan soru sayısı yanlış gösteriyor.
+/// [X] Kalan soru sayısı yanlış gösteriyor.
 /// [] Lottieleri assets klasörünün içine yükle
 /// [X] Sorular arası geçişleri daha smooth hale getir.
 /// [] Close ikonunu daha kalın bir ikon ile değiştir.
 /// [] Dark mode
 /// [] Home kısmındaki kategorileri button ile tekrardan yap.
+/// [] Ekran döndürmeyi kapat
+/// [] Cong ekranına giderken hata veriyor.
 void main() {
   runApp(MyApp());
 }

@@ -7,7 +7,6 @@ import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/services/database_helper.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
-import 'package:quizbox/view/cong_screen.dart';
 import 'package:quizbox/view/home.dart';
 import 'package:quizbox/widget/custom_button.dart';
 import 'package:provider/provider.dart';
@@ -27,11 +26,14 @@ class _WrongScreenState extends State<WrongScreen> {
     super.initState();
     updateTimer();
     clearList();
+    context.read<QuestionProvider>().resetQuestionNumber();
     dbHelper.getRandom().then((value) {
       setState(() {
         value.forEach((element) {
           context.read<QuestionProvider>().addItem(Question.map(element));
         });
+        context.read<ScoreProvider>().setRemainQuestion(
+            context.read<QuestionProvider>().questionBank.length - 1);
       });
     });
   }
@@ -49,6 +51,12 @@ class _WrongScreenState extends State<WrongScreen> {
   void resetScore() {
     if (context.read<ScoreProvider>().score > 0) {
       context.read<ScoreProvider>().resetScore();
+    }
+  }
+
+  void resetTrueNumber() {
+    if (context.read<ScoreProvider>().trueQuestion > 0) {
+      context.read<ScoreProvider>().resetTrueCount();
     }
   }
 
@@ -86,7 +94,9 @@ class _WrongScreenState extends State<WrongScreen> {
               ),
               Text('Oooops!', style: kOpsTextStyle),
               SizedBox(height: getProportionateScreenHeight(22)),
-              Text('8 soruyu doğru cevapladınız', style: kResultInfoText),
+              Text(
+                  '${context.watch<ScoreProvider>().trueQuestion} soruyu doğru cevapladın',
+                  style: kResultInfoText),
               SizedBox(height: getProportionateScreenHeight(28)),
               Text('Skor', style: kScoreInfoTextStyle),
               Text('${context.watch<ScoreProvider>().score}',
@@ -100,6 +110,7 @@ class _WrongScreenState extends State<WrongScreen> {
                     color: kSecondaryColor,
                     onPressed: () {
                       resetScore();
+                      resetTrueNumber();
                       Navigator.of(context).popAndPushNamed('/question');
                     },
                   ),

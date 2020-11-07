@@ -27,6 +27,11 @@ class ScoreProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetTrueCount() {
+    _trueQuestion = 0;
+    notifyListeners();
+  }
+
   void decrease() {
     _remainQuestion--;
     notifyListeners();

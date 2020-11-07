@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quizbox/model/question_provider.dart';
 import 'package:quizbox/model/score_provider.dart';
+import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quizbox/theme/constant.dart';
@@ -57,7 +58,9 @@ class TrueScreen extends StatelessWidget {
               ),
               Text('Doğru Cevap', style: kOpsTextStyle),
               SizedBox(height: getProportionateScreenHeight(22)),
-              Text('8 soruyu doğru cevapladın', style: kResultInfoText),
+              Text(
+                  '${context.watch<ScoreProvider>().trueQuestion} soruyu doğru cevapladın',
+                  style: kResultInfoText),
               SizedBox(height: getProportionateScreenHeight(28)),
               Text('Skor', style: kScoreInfoTextStyle),
               Text('${context.watch<ScoreProvider>().score}',
@@ -68,6 +71,8 @@ class TrueScreen extends StatelessWidget {
                 text: 'Sıradaki Soru',
                 onPressed: () {
                   context.read<QuestionProvider>().increaseQuestionNumber();
+                  context.read<ScoreProvider>().decrease();
+                  context.read<TimeModel>().resetCountDown(15);
                   Navigator.of(context).popAndPushNamed('/question');
                 },
               ),

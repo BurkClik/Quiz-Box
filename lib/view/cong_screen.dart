@@ -1,12 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quizbox/model/question.dart';
+import 'package:quizbox/model/question_provider.dart';
+import 'package:quizbox/model/score_provider.dart';
+import 'package:quizbox/model/time_model.dart';
+import 'package:quizbox/services/database_helper.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
 import 'package:quizbox/view/home.dart';
 import 'package:quizbox/widget/custom_button.dart';
+import 'package:provider/provider.dart';
 
-class CongScreen extends StatelessWidget {
+class CongScreen extends StatefulWidget {
   static String routeName = '/cong_screen';
+
+  @override
+  _CongScreenState createState() => _CongScreenState();
+}
+
+class _CongScreenState extends State<CongScreen> {
+  DatabaseHelper dbHelper = DatabaseHelper.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTimer();
+    clearList();
+    context.read<QuestionProvider>().resetQuestionNumber();
+    dbHelper.getRandom().then((value) {
+      setState(() {
+        value.forEach((element) {
+          context.read<QuestionProvider>().addItem(Question.map(element));
+        });
+        context.read<ScoreProvider>().setRemainQuestion(
+            context.read<QuestionProvider>().questionBank.length - 1);
+      });
+    });
+  }
+
+  void updateTimer() {
+    context.read<TimeModel>().resetCountDown(15);
+  }
+
+  void clearList() {
+    if (context.read<QuestionProvider>().questionBank.length > 0) {
+      context.read<QuestionProvider>().deleteAllItem();
+    }
+  }
+
+  void resetScore() {
+    if (context.read<ScoreProvider>().score > 0) {
+      context.read<ScoreProvider>().resetScore();
+    }
+  }
+
+  void resetTrueNumber() {
+    if (context.read<ScoreProvider>().trueQuestion > 0) {
+      context.read<ScoreProvider>().resetTrueCount();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,8 +95,9 @@ class CongScreen extends StatelessWidget {
               SizedBox(height: getProportionateScreenHeight(22)),
               Text('Bütün soruları doğru cevapladınız', style: kResultInfoText),
               SizedBox(height: getProportionateScreenHeight(28)),
-              Text('Yeni Yüksek Skor', style: kScoreInfoTextStyle),
-              Text('860', style: kScoreTextStyle),
+              Text('Skor', style: kScoreInfoTextStyle),
+              Text('${context.watch<ScoreProvider>().score}',
+                  style: kScoreTextStyle),
               SizedBox(height: getProportionateScreenHeight(48)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -52,7 +106,9 @@ class CongScreen extends StatelessWidget {
                     text: 'Yeniden Oyna',
                     color: kSecondaryColor,
                     onPressed: () {
-                      print('s');
+                      resetScore();
+                      resetTrueNumber();
+                      Navigator.of(context).popAndPushNamed('/question');
                     },
                   ),
                   SizedBox(width: getProportionateScreenWidth(20.0)),

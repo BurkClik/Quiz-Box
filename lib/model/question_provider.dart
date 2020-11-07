@@ -29,4 +29,9 @@ class QuestionProvider extends ChangeNotifier {
     _questionNumber++;
     notifyListeners();
   }
+
+  void resetQuestionNumber() {
+    _questionNumber = 0;
+    notifyListeners();
+  }
 }
