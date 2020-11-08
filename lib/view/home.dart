@@ -23,13 +23,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    updateTimer();
-    clearList();
-    resetScore();
-    resetTrueNumber();
-    context.read<QuestionProvider>().resetQuestionNumber();
     dbHelper.getRandom().then((value) {
       setState(() {
+        context.read<QuestionProvider>().resetQuestionNumber();
+        updateTimer();
+        clearList();
+        resetScore();
+        resetTrueNumber();
         value.forEach((element) {
           context.read<QuestionProvider>().addItem(Question.map(element));
         });

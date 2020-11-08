@@ -24,11 +24,13 @@ class _WrongScreenState extends State<WrongScreen> {
   @override
   void initState() {
     super.initState();
-    updateTimer();
-    clearList();
-    context.read<QuestionProvider>().resetQuestionNumber();
     dbHelper.getRandom().then((value) {
       setState(() {
+        if (context.read<TimeModel>().countDown > 0) {
+          updateTimer();
+        }
+        clearList();
+        context.read<QuestionProvider>().resetQuestionNumber();
         value.forEach((element) {
           context.read<QuestionProvider>().addItem(Question.map(element));
         });

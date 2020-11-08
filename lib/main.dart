@@ -6,23 +6,25 @@ import 'package:quizbox/model/score_provider.dart';
 import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/routes.dart';
 import 'package:quizbox/view/splash.dart';
+import 'package:flutter/services.dart';
 
 /// TODO:
 /// [X] Seçenekleri InkWell'den Button'a döndür
 /// [X] List separated ile ekrana Buttonları bastır.
 /// [X] Puan sistemini düzenle.
-/// [] Süreyi düzenle
+/// [X] Süreyi düzenle
 ///   [X] Yeni soruya geçildiği zaman süre resetle.
-///   [] Süre dolduğu zaman hata ekranına git.
+///   [X] Süre dolduğu zaman hata ekranına git.
 /// [X] Yeniden başlat butonuna tıklandığında dbden yeni soruları çeksin
 /// [X] Kalan soru sayısı yanlış gösteriyor.
-/// [] Lottieleri assets klasörünün içine yükle
+/// [X] Lottieleri assets klasörünün içine yükle
 /// [X] Sorular arası geçişleri daha smooth hale getir.
 /// [] Close ikonunu daha kalın bir ikon ile değiştir.
 /// [] Dark mode
 /// [] Home kısmındaki kategorileri button ile tekrardan yap.
-/// [] Ekran döndürmeyi kapat
-/// [] Cong ekranına giderken hata veriyor.
+/// [X] Ekran döndürmeyi kapat
+/// [X] Cong ekranına giderken hata veriyor.
+/// [] Süre dolduktan sonra wrong ekranından ana menüye dönerken soru ekranı geliyor.
 void main() {
   runApp(MyApp());
 }
@@ -36,6 +38,10 @@ class MyApp extends StatelessWidget {
   final List<Question> questionBank = new List();
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MultiProvider(
       providers: [
         ListenableProvider<TimeModel>(create: (_) => TimeModel(countDown)),

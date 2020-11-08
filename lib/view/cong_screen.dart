@@ -24,11 +24,11 @@ class _CongScreenState extends State<CongScreen> {
   @override
   void initState() {
     super.initState();
-    updateTimer();
-    clearList();
-    context.read<QuestionProvider>().resetQuestionNumber();
     dbHelper.getRandom().then((value) {
       setState(() {
+        updateTimer();
+        context.read<QuestionProvider>().resetQuestionNumber();
+        clearList();
         value.forEach((element) {
           context.read<QuestionProvider>().addItem(Question.map(element));
         });
@@ -43,7 +43,7 @@ class _CongScreenState extends State<CongScreen> {
   }
 
   void clearList() {
-    if (context.read<QuestionProvider>().questionBank.length > 0) {
+    if (context.read<QuestionProvider>().questionBank.isNotEmpty) {
       context.read<QuestionProvider>().deleteAllItem();
     }
   }
@@ -86,8 +86,8 @@ class _CongScreenState extends State<CongScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Lottie.network(
-                "https://assets5.lottiefiles.com/datafiles/1QPWH9xjWBflXo1QBqsL0XszJILLRF2dMiZ7PBt3/Trophy-animation/trophy.json",
+              Lottie.asset(
+                "assets/animation/trophy.json",
                 width: getProportionateScreenWidth(256),
                 height: getProportionateScreenHeight(256),
               ),

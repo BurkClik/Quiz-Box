@@ -7,6 +7,7 @@ import 'package:quizbox/model/score_provider.dart';
 import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/theme/constant.dart';
 import 'package:quizbox/theme/size_config.dart';
+import 'package:quizbox/view/splash.dart';
 import 'package:quizbox/view/wrong_screen.dart';
 import 'package:quizbox/widget/timer.dart';
 import 'package:provider/provider.dart';
@@ -94,145 +95,157 @@ class _QuestionViewState extends State<QuestionView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Image.asset(
-          "assets/images/Logo.png",
-          width: getProportionateScreenWidth(135),
-          height: getProportionateScreenHeight(50),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 8.0),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context).popAndPushNamed('/home');
-              },
-              icon: Icon(
-                Icons.close,
-                color: Colors.red,
+    if (context.watch<TimeModel>().countDown == 0) {
+      // Sorun buradan kaynaklı. Pop edemediği için eski ekranı görüyoruz
+      return WrongScreen();
+    } else {
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: Image.asset(
+            "assets/images/Logo.png",
+            width: getProportionateScreenWidth(135),
+            height: getProportionateScreenHeight(50),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.of(context).popAndPushNamed('/home');
+                },
+                icon: SvgPicture.asset("assets/icons/close2.svg",
+                    width: getProportionateScreenWidth(32.0),
+                    height: getProportionateScreenHeight(32.0)),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/light_background.png"),
-            fit: BoxFit.cover,
-          ),
+          ],
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: getProportionateScreenHeight(36.0),
-              left: getProportionateScreenWidth(20.0),
-              right: getProportionateScreenWidth(20.0),
+        body: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/light_background.png"),
+              fit: BoxFit.cover,
             ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                      bottom: getProportionateScreenHeight(8.0)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                          "Kalan Soru: ${context.watch<ScoreProvider>().remainQuestion}",
-                          style: kQuestionInfoText),
-                      Text("Puan: $score", style: kQuestionInfoText),
-                    ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: getProportionateScreenHeight(36.0),
+                left: getProportionateScreenWidth(20.0),
+                right: getProportionateScreenWidth(20.0),
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        bottom: getProportionateScreenHeight(8.0)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                            "Kalan Soru: ${context.watch<ScoreProvider>().remainQuestion}",
+                            style: kQuestionInfoText),
+                        Text("Puan: $score", style: kQuestionInfoText),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  width: getProportionateScreenWidth(360),
-                  height: getProportionateScreenHeight(200),
-                  decoration: kCategoryBoxDeco,
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: getProportionateScreenHeight(28.0)),
-                      child: Text(
-                        '${context.watch<QuestionProvider>().questionBank[questionNumber].questionText}',
-                        style: kQuestionTextStyle,
+                  Container(
+                    width: getProportionateScreenWidth(360),
+                    height: getProportionateScreenHeight(200),
+                    decoration: kCategoryBoxDeco,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: getProportionateScreenHeight(28.0)),
+                        child: Text(
+                          '${context.watch<QuestionProvider>().questionBank[questionNumber].questionText}',
+                          style: kQuestionTextStyle,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      "assets/icons/watch.svg",
-                      height: 32,
-                      width: 15,
-                    ),
-                    SizedBox(width: 4),
-                    Countdown(),
-                  ],
-                ),
-                SizedBox(height: 28),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: shuffledList.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 36),
-                    itemBuilder: (context, index) {
-                      return ChoiceButton(
-                        text: shuffledList[index],
-                        onPressed: () {
-                          if (trueAnswer == shuffledList[index]) {
-                            // if'i == 0 yap!
-                            if (context.read<ScoreProvider>().remainQuestion !=
-                                0) {
-                              setState(() {
-                                context.read<ScoreProvider>().newScore(
-                                    diffucltyPoint() *
-                                        context.read<TimeModel>().countDown);
-                                context.read<ScoreProvider>().increaseTrue();
-                                context
-                                    .read<QuestionProvider>()
-                                    .resetQuestionNumber();
-                                Navigator.of(context)
-                                    .popAndPushNamed('/cong_screen');
-                              });
-                            } else {
-                              setState(
-                                () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/watch.svg",
+                        height: 32,
+                        width: 15,
+                      ),
+                      SizedBox(width: 4),
+                      Countdown(),
+                    ],
+                  ),
+                  SizedBox(height: 28),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: shuffledList.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 36),
+                      itemBuilder: (context, index) {
+                        return ChoiceButton(
+                          text: shuffledList[index],
+                          onPressed: () {
+                            if (trueAnswer == shuffledList[index]) {
+                              // if'i == 0 yap!
+                              if (context
+                                      .read<ScoreProvider>()
+                                      .remainQuestion ==
+                                  0) {
+                                setState(() {
                                   context.read<ScoreProvider>().newScore(
                                       diffucltyPoint() *
                                           context.read<TimeModel>().countDown);
                                   context.read<ScoreProvider>().increaseTrue();
+                                  context
+                                      .read<QuestionProvider>()
+                                      .resetQuestionNumber();
+
                                   Navigator.of(context)
-                                      .popAndPushNamed('/true_screen');
-                                },
+                                      .popAndPushNamed('/cong_screen');
+                                });
+                              } else {
+                                setState(
+                                  () {
+                                    context.read<ScoreProvider>().newScore(
+                                        diffucltyPoint() *
+                                            context
+                                                .read<TimeModel>()
+                                                .countDown);
+                                    context
+                                        .read<ScoreProvider>()
+                                        .increaseTrue();
+                                    Navigator.of(context)
+                                        .popAndPushNamed('/true_screen');
+                                  },
+                                );
+                              }
+                            } else {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      WrongScreen(),
+                                ),
                               );
                             }
-                          } else {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    WrongScreen(),
-                              ),
-                            );
-                          }
-                        },
-                      );
-                    },
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
 
