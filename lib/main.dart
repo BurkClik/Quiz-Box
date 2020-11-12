@@ -5,6 +5,7 @@ import 'package:quizbox/model/question_provider.dart';
 import 'package:quizbox/model/score_provider.dart';
 import 'package:quizbox/model/time_model.dart';
 import 'package:quizbox/routes.dart';
+import 'package:quizbox/theme/theme.dart';
 import 'package:quizbox/view/splash.dart';
 import 'package:flutter/services.dart';
 
@@ -19,12 +20,12 @@ import 'package:flutter/services.dart';
 /// [X] Kalan soru sayısı yanlış gösteriyor.
 /// [X] Lottieleri assets klasörünün içine yükle
 /// [X] Sorular arası geçişleri daha smooth hale getir.
-/// [] Close ikonunu daha kalın bir ikon ile değiştir.
+/// [X] Close ikonunu daha kalın bir ikon ile değiştir.
 /// [] Dark mode
-/// [] Home kısmındaki kategorileri button ile tekrardan yap.
+/// [X] Home kısmındaki kategorileri button ile tekrardan yap.
 /// [X] Ekran döndürmeyi kapat
 /// [X] Cong ekranına giderken hata veriyor.
-/// [] Süre dolduktan sonra wrong ekranından ana menüye dönerken soru ekranı geliyor.
+/// [X] Süre dolduktan sonra wrong ekranından ana menüye dönerken soru ekranı geliyor.
 void main() {
   runApp(MyApp());
 }
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
   final int score = 0;
   final int remainQuestion = 0;
   final int trueCounter = 0;
+  final String questionCategory = 'Knowledge';
   final List<Question> questionBank = new List();
   @override
   Widget build(BuildContext context) {
@@ -46,16 +48,15 @@ class MyApp extends StatelessWidget {
       providers: [
         ListenableProvider<TimeModel>(create: (_) => TimeModel(countDown)),
         ListenableProvider<QuestionProvider>(
-            create: (_) => QuestionProvider(questionBank, questionNumber)),
+            create: (_) => QuestionProvider(
+                questionBank, questionNumber, questionCategory)),
         ListenableProvider<ScoreProvider>(
             create: (_) => ScoreProvider(score, remainQuestion, trueCounter)),
       ],
       child: MaterialApp(
         title: 'Quiz Box',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        //home: Splash(),
+        theme: lightTheme(),
+        darkTheme: darkTheme(),
         initialRoute: Splash.routeName,
         routes: routes,
       ),

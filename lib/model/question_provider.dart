@@ -8,7 +8,11 @@ class QuestionProvider extends ChangeNotifier {
   int _questionNumber;
   int get questionNumber => _questionNumber;
 
-  QuestionProvider(this._questionBank, this._questionNumber);
+  String _questionCategory;
+  String get questionCategory => _questionCategory;
+
+  QuestionProvider(
+      this._questionBank, this._questionNumber, this._questionCategory);
 
   void getQuestionBank(List<Question> databaseQuestion) {
     _questionBank = databaseQuestion;
@@ -22,7 +26,7 @@ class QuestionProvider extends ChangeNotifier {
 
   void deleteAllItem() {
     _questionBank.clear();
-    notifyListeners();
+    //notifyListeners();
   }
 
   void increaseQuestionNumber() {
@@ -32,6 +36,11 @@ class QuestionProvider extends ChangeNotifier {
 
   void resetQuestionNumber() {
     _questionNumber = 0;
+    //notifyListeners();
+  }
+
+  void updateCategory(String newCategory) {
+    _questionCategory = newCategory;
     notifyListeners();
   }
 }

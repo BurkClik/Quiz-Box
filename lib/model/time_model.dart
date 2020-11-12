@@ -8,7 +8,7 @@ class TimeModel extends ChangeNotifier {
 
   void resetCountDown(int reset) {
     _countDown = reset;
-    notifyListeners();
+    //notifyListeners();
   }
 
   void minusOne() {

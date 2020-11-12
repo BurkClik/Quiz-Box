@@ -23,20 +23,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    dbHelper.getRandom().then((value) {
-      setState(() {
-        context.read<QuestionProvider>().resetQuestionNumber();
-        updateTimer();
-        clearList();
-        resetScore();
-        resetTrueNumber();
-        value.forEach((element) {
-          context.read<QuestionProvider>().addItem(Question.map(element));
-        });
-        context.read<ScoreProvider>().setRemainQuestion(
-            context.read<QuestionProvider>().questionBank.length - 1);
-      });
-    });
+    context.read<QuestionProvider>().resetQuestionNumber();
+    updateTimer();
+    clearList();
+    resetScore();
+    resetTrueNumber();
   }
 
   void updateTimer() {
@@ -59,6 +50,45 @@ class _HomeState extends State<Home> {
     if (context.read<ScoreProvider>().trueQuestion > 0) {
       context.read<ScoreProvider>().resetTrueCount();
     }
+  }
+
+  Future<void> connectDB(String category) async {
+    List<String> difficult = ['Easy', 'Medium', 'Hard'];
+    for (int i = 0; i < 3; i++) {
+      await dbHelper.getCategoryRandom(category, difficult[i]).then((value) {
+        setState(() {
+          value.forEach((element) {
+            context.read<QuestionProvider>().addItem(Question.map(element));
+          });
+          context.read<ScoreProvider>().setRemainQuestion(
+              context.read<QuestionProvider>().questionBank.length - 1);
+        });
+      });
+    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => QuestionView(),
+      ),
+    );
+  }
+
+  Future<void> connectDBAllQuestion() async {
+    await dbHelper.getRandom().then((value) {
+      setState(() {
+        value.forEach((element) {
+          context.read<QuestionProvider>().addItem(Question.map(element));
+        });
+        context.read<ScoreProvider>().setRemainQuestion(
+            context.read<QuestionProvider>().questionBank.length - 1);
+      });
+    });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => QuestionView(),
+      ),
+    );
   }
 
   @override
@@ -88,28 +118,35 @@ class _HomeState extends State<Home> {
               CategoryRow(
                 leftCategoryName: 'Genel Kültür',
                 leftAssetName: 'assets/icons/culture.svg',
+                lGetData: () {
+                  connectDBAllQuestion();
+                },
                 rightCategoryName: 'Bilim',
                 rightAssetName: 'assets/icons/science.svg',
-                getData: () {},
               ),
               SizedBox(height: 10),
               CategoryRow(
                 leftCategoryName: 'Edebiyat',
                 leftAssetName: 'assets/icons/literature.svg',
                 rightCategoryName: 'Sinema',
-                rightAssetName: 'assets/icons/movie.svg',
+                rightAssetName: 'assets/icons/cinema.svg',
               ),
               SizedBox(height: 10),
               CategoryRow(
-                leftCategoryName: 'Tarih',
-                leftAssetName: 'assets/icons/history.svg',
-                leftHeight: 52.0,
-                leftWidth: 52.0,
-                rightCategoryName: 'Coğrafya',
-                rightAssetName: 'assets/icons/earth.svg',
-                rightHeight: 52.0,
-                rightWidth: 52.0,
-              ),
+                  leftCategoryName: 'Tarih',
+                  leftAssetName: 'assets/icons/ancient.svg',
+                  leftHeight: 52.0,
+                  leftWidth: 52.0,
+                  lGetData: () {
+                    connectDB('History');
+                  },
+                  rightCategoryName: 'Coğrafya',
+                  rightAssetName: 'assets/icons/earth.svg',
+                  rightHeight: 52.0,
+                  rightWidth: 52.0,
+                  rGetData: () {
+                    connectDB('Geography');
+                  }),
               SizedBox(height: 10),
               CategoryRow(
                 leftCategoryName: 'Spor',
@@ -138,14 +175,16 @@ class CategoryRow extends StatelessWidget {
   final double leftHeight;
   final double rightWidth;
   final double rightHeight;
-  final Function getData;
+  final Function lGetData;
+  final Function rGetData;
 
   CategoryRow({
     @required this.leftCategoryName,
     @required this.leftAssetName,
     @required this.rightCategoryName,
     @required this.rightAssetName,
-    this.getData,
+    this.lGetData,
+    this.rGetData,
     double leftWidth,
     double leftHeight,
     double rightWidth,
@@ -165,7 +204,7 @@ class CategoryRow extends StatelessWidget {
           assetName: leftAssetName,
           width: leftWidth,
           height: leftHeight,
-          getData: getData,
+          getData: lGetData,
         ),
         SizedBox(width: getProportionateScreenHeight(48.0)),
         CategoryBox(
@@ -173,7 +212,7 @@ class CategoryRow extends StatelessWidget {
           assetName: rightAssetName,
           width: rightWidth,
           height: rightHeight,
-          getData: getData,
+          getData: rGetData,
         ),
       ],
     );
@@ -193,41 +232,78 @@ class CategoryBox extends StatelessWidget {
       this.getData,
       this.width,
       this.height});
-
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      splashColor: Colors.orange,
-      highlightColor: Colors.transparent,
-      onTap: () {
-        getData();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => QuestionView(),
-          ),
-        );
-      },
-      child: Container(
-        width: getProportionateScreenWidth(120.0),
-        height: getProportionateScreenHeight(120.0),
-        decoration: kCategoryBoxDeco,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            SvgPicture.asset(
-              assetName,
-              width: getProportionateScreenWidth(width),
-              height: getProportionateScreenHeight(height),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: getProportionateScreenHeight(8.0),
-                top: getProportionateScreenHeight(8.0),
+    return Container(
+      child: Material(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Container(
+          width: getProportionateScreenWidth(120.0),
+          height: getProportionateScreenHeight(120.0),
+          decoration: kCategoryBoxDeco,
+          child: Material(
+            type: MaterialType.transparency,
+            color: Colors.transparent,
+            child: InkWell(
+              highlightColor: kThirdColor,
+              borderRadius: BorderRadius.circular(10.0),
+              onTap: () {
+                getData();
+                switch (categoryName) {
+                  case 'Genel Kültür':
+                    context
+                        .read<QuestionProvider>()
+                        .updateCategory('Knowledge');
+                    break;
+                  case 'Bilim':
+                    context.read<QuestionProvider>().updateCategory('Science');
+                    break;
+                  case 'Edebiyat':
+                    context
+                        .read<QuestionProvider>()
+                        .updateCategory('Literature');
+                    break;
+                  case 'Sinema':
+                    context.read<QuestionProvider>().updateCategory('Cinema');
+                    break;
+                  case 'Tarih':
+                    context.read<QuestionProvider>().updateCategory('History');
+                    break;
+                  case 'Coğrafya':
+                    context
+                        .read<QuestionProvider>()
+                        .updateCategory('Geography');
+                    break;
+                  case 'Spor':
+                    context.read<QuestionProvider>().updateCategory('Sport');
+                    break;
+                  case 'Müzil':
+                    context.read<QuestionProvider>().updateCategory('Müzik');
+                    break;
+                  default:
+                }
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SvgPicture.asset(
+                    assetName,
+                    width: getProportionateScreenWidth(width),
+                    height: getProportionateScreenHeight(height),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: getProportionateScreenHeight(8.0),
+                      top: getProportionateScreenHeight(8.0),
+                    ),
+                    child: Text(categoryName, style: kCategoryTextStyle),
+                  ),
+                ],
               ),
-              child: Text(categoryName, style: kCategoryTextStyle),
             ),
-          ],
+          ),
         ),
       ),
     );

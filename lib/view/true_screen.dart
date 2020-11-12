@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:quizbox/model/question_provider.dart';
 import 'package:quizbox/model/score_provider.dart';
 import 'package:quizbox/model/time_model.dart';
@@ -20,9 +21,6 @@ class TrueScreen extends StatelessWidget {
           width: getProportionateScreenWidth(135),
           height: getProportionateScreenHeight(50),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 8.0),
@@ -30,10 +28,9 @@ class TrueScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).popAndPushNamed('/home');
               },
-              icon: Icon(
-                Icons.close,
-                color: Colors.red,
-              ),
+              icon: SvgPicture.asset("assets/icons/close2.svg",
+                  width: getProportionateScreenWidth(32.0),
+                  height: getProportionateScreenHeight(32.0)),
             ),
           ),
         ],

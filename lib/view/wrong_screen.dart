@@ -20,24 +20,28 @@ class WrongScreen extends StatefulWidget {
 
 class _WrongScreenState extends State<WrongScreen> {
   DatabaseHelper dbHelper = DatabaseHelper.instance;
+  String category;
 
   @override
   void initState() {
     super.initState();
-    dbHelper.getRandom().then((value) {
-      setState(() {
-        if (context.read<TimeModel>().countDown > 0) {
-          updateTimer();
-        }
-        clearList();
-        context.read<QuestionProvider>().resetQuestionNumber();
-        value.forEach((element) {
-          context.read<QuestionProvider>().addItem(Question.map(element));
+    category = context.read<QuestionProvider>().questionCategory;
+    if (context.read<TimeModel>().countDown > 0) {
+      updateTimer();
+    }
+    clearList();
+    context.read<QuestionProvider>().resetQuestionNumber();
+    if (category == 'Knowledge') {
+      dbHelper.getRandom().then((value) {
+        setState(() {
+          value.forEach((element) {
+            context.read<QuestionProvider>().addItem(Question.map(element));
+          });
+          context.read<ScoreProvider>().setRemainQuestion(
+              context.read<QuestionProvider>().questionBank.length - 1);
         });
-        context.read<ScoreProvider>().setRemainQuestion(
-            context.read<QuestionProvider>().questionBank.length - 1);
       });
-    });
+    }
   }
 
   void updateTimer() {
@@ -72,9 +76,6 @@ class _WrongScreenState extends State<WrongScreen> {
           width: getProportionateScreenWidth(135),
           height: getProportionateScreenHeight(50),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
       ),
       body: Container(
         width: double.infinity,
@@ -110,9 +111,31 @@ class _WrongScreenState extends State<WrongScreen> {
                   CustomButton(
                     text: 'Yeniden Oyna',
                     color: kSecondaryColor,
-                    onPressed: () {
+                    onPressed: () async {
                       resetScore();
                       resetTrueNumber();
+                      if (category != 'Knowledge') {
+                        List<String> difficult = ['Easy', 'Medium', 'Hard'];
+                        for (int i = 0; i < 3; i++) {
+                          await dbHelper
+                              .getCategoryRandom(category, difficult[i])
+                              .then((value) {
+                            setState(() {
+                              value.forEach((element) {
+                                context
+                                    .read<QuestionProvider>()
+                                    .addItem(Question.map(element));
+                              });
+                              context.read<ScoreProvider>().setRemainQuestion(
+                                  context
+                                          .read<QuestionProvider>()
+                                          .questionBank
+                                          .length -
+                                      1);
+                            });
+                          });
+                        }
+                      }
                       Navigator.of(context).popAndPushNamed('/question');
                     },
                   ),

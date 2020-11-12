@@ -19,7 +19,7 @@ class ScoreProvider extends ChangeNotifier {
 
   void resetScore() {
     _score = 0;
-    notifyListeners();
+    //notifyListeners();
   }
 
   void increaseTrue() {
@@ -29,7 +29,7 @@ class ScoreProvider extends ChangeNotifier {
 
   void resetTrueCount() {
     _trueQuestion = 0;
-    notifyListeners();
+    //notifyListeners();
   }
 
   void decrease() {
