@@ -28,18 +28,6 @@ class _CongScreenState extends State<CongScreen> {
     category = context.read<QuestionProvider>().questionCategory;
     updateTimer();
     context.read<QuestionProvider>().resetQuestionNumber();
-    clearList();
-    if (category == 'Knowledge') {
-      dbHelper.getRandom().then((value) {
-        setState(() {
-          value.forEach((element) {
-            context.read<QuestionProvider>().addItem(Question.map(element));
-          });
-          context.read<ScoreProvider>().setRemainQuestion(
-              context.read<QuestionProvider>().questionBank.length - 1);
-        });
-      });
-    }
   }
 
   void updateTimer() {
@@ -107,14 +95,33 @@ class _CongScreenState extends State<CongScreen> {
                     text: 'Yeniden Oyna',
                     color: kSecondaryColor,
                     onPressed: () async {
+                      clearList();
                       resetScore();
                       resetTrueNumber();
+                      List<String> difficult = ['Easy', 'Medium', 'Hard'];
                       if (category != 'Knowledge') {
-                        List<String> difficult = ['Easy', 'Medium', 'Hard'];
                         for (int i = 0; i < 3; i++) {
                           await dbHelper
                               .getCategoryRandom(category, difficult[i])
                               .then((value) {
+                            setState(() {
+                              value.forEach((element) {
+                                context
+                                    .read<QuestionProvider>()
+                                    .addItem(Question.map(element));
+                              });
+                              context.read<ScoreProvider>().setRemainQuestion(
+                                  context
+                                          .read<QuestionProvider>()
+                                          .questionBank
+                                          .length -
+                                      1);
+                            });
+                          });
+                        }
+                      } else {
+                        for (int i = 0; i < 3; i++) {
+                          await dbHelper.getRandom(difficult[i]).then((value) {
                             setState(() {
                               value.forEach((element) {
                                 context

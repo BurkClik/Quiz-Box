@@ -61,10 +61,10 @@ class DatabaseHelper {
   }
 
   // RAW Query
-  Future<List> getRandom() async {
+  Future<List> getRandom(String difficulty) async {
     var db = await instance.database;
-    var result =
-        await db.rawQuery('SELECT * FROM $table ORDER BY RANDOM() LIMIT 15');
+    var result = await db.rawQuery(
+        "SELECT * FROM $table WHERE Difficulty == '$difficulty' ORDER BY RANDOM() LIMIT 5");
     return result.toList();
   }
 

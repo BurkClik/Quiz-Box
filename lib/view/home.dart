@@ -74,15 +74,18 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> connectDBAllQuestion() async {
-    await dbHelper.getRandom().then((value) {
-      setState(() {
-        value.forEach((element) {
-          context.read<QuestionProvider>().addItem(Question.map(element));
+    List<String> difficult = ['Easy', 'Medium', 'Hard'];
+    for (int i = 0; i < 3; i++) {
+      await dbHelper.getRandom(difficult[i]).then((value) {
+        setState(() {
+          value.forEach((element) {
+            context.read<QuestionProvider>().addItem(Question.map(element));
+          });
+          context.read<ScoreProvider>().setRemainQuestion(
+              context.read<QuestionProvider>().questionBank.length - 1);
         });
-        context.read<ScoreProvider>().setRemainQuestion(
-            context.read<QuestionProvider>().questionBank.length - 1);
       });
-    });
+    }
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

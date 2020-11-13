@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quizbox/model/question.dart';
 import 'package:quizbox/model/question_provider.dart';
@@ -29,19 +30,7 @@ class _WrongScreenState extends State<WrongScreen> {
     if (context.read<TimeModel>().countDown > 0) {
       updateTimer();
     }
-    clearList();
     context.read<QuestionProvider>().resetQuestionNumber();
-    if (category == 'Knowledge') {
-      dbHelper.getRandom().then((value) {
-        setState(() {
-          value.forEach((element) {
-            context.read<QuestionProvider>().addItem(Question.map(element));
-          });
-          context.read<ScoreProvider>().setRemainQuestion(
-              context.read<QuestionProvider>().questionBank.length - 1);
-        });
-      });
-    }
   }
 
   void updateTimer() {
@@ -112,14 +101,33 @@ class _WrongScreenState extends State<WrongScreen> {
                     text: 'Yeniden Oyna',
                     color: kSecondaryColor,
                     onPressed: () async {
+                      clearList();
                       resetScore();
                       resetTrueNumber();
+                      List<String> difficult = ['Easy', 'Medium', 'Hard'];
                       if (category != 'Knowledge') {
-                        List<String> difficult = ['Easy', 'Medium', 'Hard'];
                         for (int i = 0; i < 3; i++) {
                           await dbHelper
                               .getCategoryRandom(category, difficult[i])
                               .then((value) {
+                            setState(() {
+                              value.forEach((element) {
+                                context
+                                    .read<QuestionProvider>()
+                                    .addItem(Question.map(element));
+                              });
+                              context.read<ScoreProvider>().setRemainQuestion(
+                                  context
+                                          .read<QuestionProvider>()
+                                          .questionBank
+                                          .length -
+                                      1);
+                            });
+                          });
+                        }
+                      } else {
+                        for (int i = 0; i < 3; i++) {
+                          await dbHelper.getRandom(difficult[i]).then((value) {
                             setState(() {
                               value.forEach((element) {
                                 context
