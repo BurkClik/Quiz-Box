@@ -126,13 +126,22 @@ class _HomeState extends State<Home> {
                 },
                 rightCategoryName: 'Bilim',
                 rightAssetName: 'assets/icons/science.svg',
+                rGetData: () {
+                  connectDB('Science');
+                },
               ),
               SizedBox(height: 10),
               CategoryRow(
                 leftCategoryName: 'Edebiyat',
                 leftAssetName: 'assets/icons/literature.svg',
+                lGetData: () {
+                  connectDB('Literature');
+                },
                 rightCategoryName: 'Sinema',
                 rightAssetName: 'assets/icons/cinema.svg',
+                rGetData: () {
+                  connectDB('Cinema');
+                },
               ),
               SizedBox(height: 10),
               CategoryRow(
@@ -156,10 +165,16 @@ class _HomeState extends State<Home> {
                 leftAssetName: 'assets/icons/sport.svg',
                 leftHeight: 52.0,
                 leftWidth: 52.0,
+                lGetData: () {
+                  connectDB('Sport');
+                },
                 rightCategoryName: 'Müzik',
                 rightAssetName: 'assets/icons/music.svg',
                 rightHeight: 52.0,
                 rightWidth: 52.0,
+                rGetData: () {
+                  connectDB('Music');
+                },
               ),
             ],
           ),
