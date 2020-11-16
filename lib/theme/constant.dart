@@ -116,3 +116,13 @@ const kButtonBoxDeco = BoxDecoration(
     ),
   ],
 );
+
+//======================================
+// AlertDialog
+//======================================
+const kAlertButtonStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 16.0,
+  fontFamily: 'Kodchasan',
+  fontWeight: FontWeight.w500,
+);

@@ -145,20 +145,21 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(height: 10),
               CategoryRow(
-                  leftCategoryName: 'Tarih',
-                  leftAssetName: 'assets/icons/ancient.svg',
-                  leftHeight: 52.0,
-                  leftWidth: 52.0,
-                  lGetData: () {
-                    connectDB('History');
-                  },
-                  rightCategoryName: 'Coğrafya',
-                  rightAssetName: 'assets/icons/earth.svg',
-                  rightHeight: 52.0,
-                  rightWidth: 52.0,
-                  rGetData: () {
-                    connectDB('Geography');
-                  }),
+                leftCategoryName: 'Tarih',
+                leftAssetName: 'assets/icons/ancient.svg',
+                leftHeight: 52.0,
+                leftWidth: 52.0,
+                lGetData: () {
+                  connectDB('History');
+                },
+                rightCategoryName: 'Coğrafya',
+                rightAssetName: 'assets/icons/earth.svg',
+                rightHeight: 52.0,
+                rightWidth: 52.0,
+                rGetData: () {
+                  connectDB('Geography');
+                },
+              ),
               SizedBox(height: 10),
               CategoryRow(
                 leftCategoryName: 'Spor',
@@ -297,8 +298,8 @@ class CategoryBox extends StatelessWidget {
                   case 'Spor':
                     context.read<QuestionProvider>().updateCategory('Sport');
                     break;
-                  case 'Müzil':
-                    context.read<QuestionProvider>().updateCategory('Müzik');
+                  case 'Müzik':
+                    context.read<QuestionProvider>().updateCategory('Music');
                     break;
                   default:
                 }

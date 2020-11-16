@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "56526344243",
+    "firebase_url": "https://quiz-boxapp.firebaseio.com",
+    "project_id": "quiz-boxapp",
+    "storage_bucket": "quiz-boxapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56526344243:android:cc85c222e416289850d346",
+        "android_client_info": {
+          "package_name": "com.burkclik.quizbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56526344243-0f2cf1s06gelg5j9eb7672eo1hjme904.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcwXDHeu1SSJVjuP6duSGFk67czWj4xhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56526344243-0f2cf1s06gelg5j9eb7672eo1hjme904.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

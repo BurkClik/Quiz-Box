@@ -8,6 +8,7 @@ import 'package:quizbox/routes.dart';
 import 'package:quizbox/theme/theme.dart';
 import 'package:quizbox/view/splash.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 /// TODO:
 /// [X] Seçenekleri InkWell'den Button'a döndür
@@ -26,8 +27,18 @@ import 'package:flutter/services.dart';
 /// [X] Ekran döndürmeyi kapat
 /// [X] Cong ekranına giderken hata veriyor.
 /// [X] Süre dolduktan sonra wrong ekranından ana menüye dönerken soru ekranı geliyor.
-void main() {
+/// [] Native Splash Screen
+/// [] Paylaş Butonu
+/// [] Scorelar kalıcı olarak telefonda tutulacak(Hive or SharedPrefences)
+/// [] Soru bildirme
+/// [] Soru ekleme
+/// [] Bildirim
+/// [] Firebase entegrasyonu
+/// [] Reklam
+/// [] Crashanalytics
+void main() async {
   runApp(MyApp());
+  await Firebase.initializeApp();
 }
 
 class MyApp extends StatelessWidget {
