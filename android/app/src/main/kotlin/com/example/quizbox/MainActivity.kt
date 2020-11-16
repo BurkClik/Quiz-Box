@@ -1,4 +1,4 @@
-package com.example.quizbox
+package com.burkclik.quizbox
 
 import io.flutter.embedding.android.FlutterActivity
 

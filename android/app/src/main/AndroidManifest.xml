@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.quizbox">
+    package="com.burkclik.quizbox">
    <application
         android:label="quizbox"
         android:icon="@mipmap/ic_launcher">
