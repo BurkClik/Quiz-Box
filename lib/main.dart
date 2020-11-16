@@ -9,6 +9,7 @@ import 'package:quizbox/theme/theme.dart';
 import 'package:quizbox/view/splash.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 /// TODO:
 /// [X] Seçenekleri InkWell'den Button'a döndür
@@ -28,9 +29,9 @@ import 'package:firebase_core/firebase_core.dart';
 /// [X] Cong ekranına giderken hata veriyor.
 /// [X] Süre dolduktan sonra wrong ekranından ana menüye dönerken soru ekranı geliyor.
 /// [] Native Splash Screen
-/// [] Paylaş Butonu
+/// [X] Paylaş Butonu
 /// [] Scorelar kalıcı olarak telefonda tutulacak(Hive or SharedPrefences)
-/// [] Soru bildirme
+/// [X] Soru bildirme
 /// [] Soru ekleme
 /// [] Bildirim
 /// [] Firebase entegrasyonu
@@ -39,6 +40,10 @@ import 'package:firebase_core/firebase_core.dart';
 void main() async {
   runApp(MyApp());
   await Firebase.initializeApp();
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
+  WidgetsFlutterBinding.ensureInitialized();
 }
 
 class MyApp extends StatelessWidget {

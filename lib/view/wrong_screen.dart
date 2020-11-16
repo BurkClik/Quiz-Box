@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:share/share.dart';
 
 class WrongScreen extends StatefulWidget {
   static String routeName = '/wrong_screen';
@@ -95,6 +96,33 @@ class _WrongScreenState extends State<WrongScreen> {
               width: getProportionateScreenWidth(32.0),
               height: getProportionateScreenHeight(36.0)),
         ),
+        actions: [
+          IconButton(
+            splashColor: kThirdColor,
+            splashRadius: 24.0,
+            onPressed: () async {
+              try {
+                final result = await InternetAddress.lookup('google.com');
+                if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                  Share.share(
+                      "${context.read<QuestionProvider>().questionCategory} kategorisinde ${context.read<ScoreProvider>().score} puan aldım. Beni geçebilir misin?");
+                }
+              } on SocketException catch (_) {
+                Fluttertoast.showToast(
+                  msg: "Lütfen internet bağlantınızı kontrol edin",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.TOP,
+                  backgroundColor: Color(0xFFEC1C24),
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            },
+            icon: SvgPicture.asset("assets/icons/forward.svg",
+                width: getProportionateScreenWidth(32.0),
+                height: getProportionateScreenHeight(32.0)),
+          )
+        ],
       ),
       body: Container(
         width: double.infinity,

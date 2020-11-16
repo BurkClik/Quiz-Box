@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quizbox/model/question.dart';
 import 'package:quizbox/model/question_provider.dart';
@@ -10,6 +13,7 @@ import 'package:quizbox/theme/size_config.dart';
 import 'package:quizbox/view/home.dart';
 import 'package:quizbox/widget/custom_button.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
 class CongScreen extends StatefulWidget {
   static String routeName = '/cong_screen';
@@ -62,6 +66,31 @@ class _CongScreenState extends State<CongScreen> {
           width: getProportionateScreenWidth(135),
           height: getProportionateScreenHeight(50),
         ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              try {
+                final result = await InternetAddress.lookup('google.com');
+                if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                  Share.share(
+                      "${context.read<QuestionProvider>().questionCategory} kategorisinde ${context.read<ScoreProvider>().score} puan aldım. Beni geçebilir misin?");
+                }
+              } on SocketException catch (_) {
+                Fluttertoast.showToast(
+                  msg: "Lütfen internet bağlantınızı kontrol edin",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.TOP,
+                  backgroundColor: Color(0xFFEC1C24),
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            },
+            icon: SvgPicture.asset("assets/icons/forward.svg",
+                width: getProportionateScreenWidth(32.0),
+                height: getProportionateScreenHeight(32.0)),
+          )
+        ],
       ),
       body: Container(
         width: double.infinity,
