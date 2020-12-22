@@ -71,6 +71,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Quiz Box',
+        debugShowCheckedModeBanner: false,
         theme: lightTheme(),
         darkTheme: darkTheme(),
         initialRoute: Splash.routeName,

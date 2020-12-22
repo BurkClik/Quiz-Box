@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.burkclik.quizbox">
+
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="quizbox"
+        android:label="QuizBox"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
